@@ -21,7 +21,7 @@ public class CostManagementSetup : IAreaSetup
 
     public void RegisterCommands(CommandGroup rootGroup, ILoggerFactory loggerFactory)
     {
-        var costManagement = new CommandGroup(Name, "Cost Management operations - Commands for querying Azure Cost Management data for usage and cost information.");
+        var costManagement = new CommandGroup(Name, "Cost Management operations - Commands for querying Azure Cost Management data for usage and cost information. Allows filtering by from and to date, time granularity, and grouping by Azure dimensions.");
         rootGroup.AddSubGroup(costManagement);
 
         costManagement.AddCommand("get", new CostGetCommand(

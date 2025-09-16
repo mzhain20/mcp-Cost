@@ -56,7 +56,7 @@ public sealed class CostManagementService(
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             // Make the API call
-            var url = $"/subscriptions/{subscription}/providers/Microsoft.CostManagement/query?api-version={CostManagementApiVersion}";
+            var url = $"/subscriptions/{subscription}/providers/Microsoft.CostManagement/query?api-version={CostManagementApiVersion}&top=5000";
             using var response = await client.PostAsync(url, content);
             response.EnsureSuccessStatusCode();
 

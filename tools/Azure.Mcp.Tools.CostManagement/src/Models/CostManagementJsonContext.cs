@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Azure.Mcp.Tools.CostManagement.Commands.Cost;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Azure.Mcp.Tools.CostManagement.Models;
@@ -18,6 +19,8 @@ namespace Azure.Mcp.Tools.CostManagement.Models;
 [JsonSerializable(typeof(QueryResultProperties))]
 [JsonSerializable(typeof(QueryColumn))]
 [JsonSerializable(typeof(CostGetCommand.CostGetCommandResult))]
+[JsonSerializable(typeof(JsonElement))]
+[JsonSerializable(typeof(object))]
 internal partial class CostManagementJsonContext : JsonSerializerContext
 {
 }
