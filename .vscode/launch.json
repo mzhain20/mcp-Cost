@@ -499,6 +499,27 @@
             "env": {
                 "DOTNET_ENVIRONMENT": "Development"
             }
+        },
+        {
+            "name": "Debug Cost Management Get",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/servers/Azure.Mcp.Server/src/bin/Debug/net9.0/azmcp.exe",
+            "args": [
+                "costmanagement",
+                "get",
+                "--subscription",
+                "9cad9a8f-1bc0-44fc-a267-09109199538d",
+                "--granularity",
+                "daily"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
         }
     ],
     "compounds": [

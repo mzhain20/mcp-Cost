@@ -1,0 +1,165 @@
+{
+  "pluginName": "cost_management_query_plugin",
+  "allowedClients": [ "Agent:CostManagementAgent" ],
+  "isLKG": true,
+  "icm": {
+    "service": "Commerce Cost Management",
+    "team": "CCM-LUX",
+    "teamId": ""
+  },
+  "manifest": {
+    "version": "1.0.0",
+    "schema_version": "v1",
+    "name_for_human": "cost_management_query_plugin",
+    "description_for_human": "Getting Cost Management Actuals",
+    "functions": [
+      {
+        "name": "cost_management_query_plugin",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dataset": {
+              "type": "object",
+              "properties": {
+                "granularity": {
+                  "type": "string",
+                  "enum": [ "None", "Daily", "Monthly" ],
+                  "description": "Granularity groups cost data by time intervals of a day, month or not at all. Select 'None' if the user wants to see the total costs over the time period, or if the user wants to see a specific day or month. Select 'Daily' or 'Monthly' if a user wants to see trends over a time period. Select 'Daily' when keywords like 'daily', 'per day' are present or multiple days are specified. Select 'Monthly' when keywords like 'monthly', 'per month' are present or multiple months specified. Granularity is distinct from the time period."
+                },
+                "aggregationCostType": {
+                  "type": "string",
+                  "description": "The type of cost to use. This can either be Pre Tax Cost or Total Cost, and it can be either in USD or local currency.",
+                  "enum": [ "PreTaxCost", "Cost", "PreTaxCostUSD", "CostUSD" ],
+                  "default": "Cost"
+                },
+                "grouping": {
+                  "type": "array",
+                  "default": null,
+                  "description": "Like a SQL Group By clause. This groups the cost data by specific dimensions or tags. This should be used when the user wants a cost breakdown on the specified dimension (eg/ 'cost per service type') or the user wants to see the cost for multiple values in a dimension (eg/ 'cost for services Virtual Machines, Storage and Databases')",
+                  "maxItems": 2,
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "description": "Group by a specific dimension",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "enum": [
+                              "MeterCategory",
+                              "ResourceLocation",
+                              "ResourceGroupName",
+                              "PricingModel",
+                              "ResourceGuid",
+                              "BenefitName"
+                            ],
+                            "description": "The name of the column to group by. Use 'MeterCategory' if the user wants cost breakdown for Azure Service Types (eg 'Virtual Machines', 'Storage'). Use 'ResourceLocation' to group by deployed resource region (eg 'East US', 'West Europe'). Use 'ResourceGroupName' to group by Resource Group Name. Use 'PricingModel' to group by Pricing Model (eg 'Pay-As-You-Go', 'Reserved'). Use 'ResourceId' to group costs per resource. Use 'BenefitName' if the user specifies a Benefit Name."
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [ "Dimension" ]
+                          }
+                        },
+                        "required": [ "name", "type" ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "description": "Group by a specific tag",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the tag key to group by. This should be excatly as the user specifies it, including case sensitivity. For example, if the user specifies 'Environment', use 'Environment'. If the user specifies 'environment', use 'environment'."
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [ "TagKey" ]
+                          }
+                        },
+                        "required": [ "name", "type" ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                }
+              },
+              "required": [ "granularity", "aggregationCostType" ],
+              "additionalProperties": false
+            },
+            "costType": {
+              "type": "string",
+              "enum": [ "ActualCost", "AmortizedCost" ],
+              "description": "The cost type parameter for the query API. Determines whether to use 'ActualCost' (default) or 'AmortizedCost' based on user intent. ActualCost for general cost queries, AmortizedCost for reservation/savings plan utilization, coverage, and amortization scenarios. Use ActualCost by default. Only use AmortizedCost when specifically asked for the amount of used, unused, unutilized, or wasted reservation and savings plan benefits, breaking down a one-time cost into periodic payments, and identifying resources, subscriptions, and other entities that received benefits or coverage from reservations and savings plans benefits.",
+              "default": "ActualCost"
+            },
+            "timeperiod": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "Start date of the time period. Use YYYY-MM-DDTHH:MM:SS format",
+                  "pattern": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})$"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "End date of the time period. Use YYYY-MM-DDTHH:MM:SS format",
+                  "pattern": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})$"
+                }
+              },
+              "required": [ "to", "from" ],
+              "additionalProperties": false,
+              "description": "The time period for the cost query with 'from' and 'to' dates. Determine the specific date range based on user intent. If no time period is specified in the user prompt, set 'from' as 1 month from today, and 'to' as todays date. 'to' should be set to today's date when used to determine all relative dates eg/ last week, last month, last year. When user refers to a month, default to first of the month unless specifically stated otherwise. Dates should be in YYYY-MM-DDTHH:MM:SS format. The time period should be a maximum of 1 year, therefore if there is a request for cost management data greater than 1 year just use 1 year. Consider adjusting time periods to start and end on the first and last day of the month/year/financial year respectively, when appropriate."
+            },
+            "subscriptionId": {
+              "description": "The subscriptionId to get the cost data for",
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+            }
+          },
+          "required": [ "subscriptionId", "costType", "timeperiod", "dataset" ],
+          "additionalProperties": false
+        },
+        "states": {
+          "reasoning": {
+            "description": "Get cost information for Azure, all returned costs are Actual costs. All cost information is grouped by a subscription; if there is no subscription Id (guuid) in the users request clarify the subscription Id before continuing. Do not use a placeholder for subscription Id. If a subscription Id cannot be inferred request clarification from the user",
+            "examples": [
+              "What are my last 3 month's compute costs in subscription 9cad9a8f-1bc0-44fc-a267-09109199538d",
+              "Can you provide a cost breakdown for Prod vs UAT vs DEV using the Tag Environment in subscription 9cad9a8f-1bc0-44fc-a267-09109199538d",
+              "Can you show me cost per resource type in subscription 9cad9a8f-1bc0-44fc-a267-09109199538d and resource group my-RG"
+            ]
+          }
+        }
+      }
+    ],
+    "runtimes": [
+      {
+        "auth": {
+          "scopes": [ "https://management.azure.com/.default" ],
+          "type": "EntraOnBehalfOf"
+        },
+        "run_for_functions": [ "cost_management_query_plugin" ],
+        "spec": [
+          {
+            "dataBoundary": "ROW",
+            "urlTemplate": "https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.CostManagement/query?api-version=2025-03-01",
+            "http_method": "POST",
+            "script": "function EvaluateHttpPluginPayLoad(response) local d={} if response.dataset.aggregationCostType then d.aggregation={totalCost={[\"function\"]=\"Sum\",name=response.dataset.aggregationCostType or \"Cost\"}} end if response.dataset.granularity then d.granularity=response.dataset.granularity end if response and type(response.dataset)==\"table\" then local g=response.dataset.grouping if (type(g)==\"string\" and g~=\"\") or (type(g)==\"table\" and next(g)) then d.grouping=g d.sorting={{name=response.dataset.aggregationCostType or \"Cost\",direction=\"Descending\"}} end end return {timeframe=\"Custom\",dataset=d,timeperiod=response.timeperiod,type=response.costType} end",
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          {
+            "dataBoundary": "EU",
+            "urlTemplate": "https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.CostManagement/query?api-version=2025-03-01",
+            "http_method": "POST",
+            "script": "function EvaluateHttpPluginPayLoad(response) local d={} if response.dataset.aggregationCostType then d.aggregation={totalCost={[\"function\"]=\"Sum\",name=response.dataset.aggregationCostType or \"Cost\"}} end if response.dataset.granularity then d.granularity=response.dataset.granularity end if response and type(response.dataset)==\"table\" then local g=response.dataset.grouping if (type(g)==\"string\" and g~=\"\") or (type(g)==\"table\" and next(g)) then d.grouping=g d.sorting={{name=response.dataset.aggregationCostType or \"Cost\",direction=\"Descending\"}} end end return {timeframe=\"Custom\",dataset=d,timeperiod=response.timeperiod,type=response.costType} end",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        ],
+        "type": "Http"
+      }
+    ]
+  }
+}
