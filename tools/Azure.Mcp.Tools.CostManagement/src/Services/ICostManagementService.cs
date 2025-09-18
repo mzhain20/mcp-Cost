@@ -31,4 +31,16 @@ public interface ICostManagementService
         string aggregationCostType = "Cost",
         string? tenant = null,
         RetryPolicyOptions? retryPolicy = null);
+
+    Task<QueryApiResponse?> QueryForecast(
+        string subscription,
+        string type,
+        string granularity,
+        DateTime? fromDate = null,
+        DateTime? toDate = null,
+        string aggregationCostType = "Cost",
+        bool includeActualCost = false,
+        bool includeFreshPartialCost = false,
+        string? tenant = null,
+        RetryPolicyOptions? retryPolicy = null);
 }

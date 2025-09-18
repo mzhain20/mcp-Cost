@@ -9,7 +9,7 @@ namespace Azure.Mcp.Tools.CostManagement.Models;
 public static class CostManagementConstants
 {
     /// <summary>
-    /// Export/Query types.
+    /// Export/Query/Forecast types.
     /// </summary>
     public static class ExportType
     {
@@ -38,6 +38,7 @@ public static class CostManagementConstants
     {
         public const string Daily = "Daily";
         public const string None = "None";
+        public const string Monthly = "Monthly";
     }
 
     /// <summary>
@@ -46,6 +47,18 @@ public static class CostManagementConstants
     public static class FunctionType
     {
         public const string Sum = "Sum";
+        public const string Average = "Avg";
+        public const string Count = "Count";
+        public const string Min = "Min";
+        public const string Max = "Max";
+    }
+
+    public static class FunctionName
+    {
+        public const string Cost = "Cost";
+        public const string CostUSD = "CostUSD";
+        public const string PreTaxCost = "PreTaxCost";
+        public const string PreTaxCostUSD = "PreTaxCostUSD";
     }
 
     /// <summary>
