@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Text.Json.Serialization;
 using Azure.Mcp.Core.Commands;
 using Azure.Mcp.Core.Extensions;
 using Azure.Mcp.Tools.Storage.Models;
@@ -73,9 +74,7 @@ public sealed class FileSystemListPathsCommand(ILogger<FileSystemListPathsComman
                 options.Tenant,
                 options.RetryPolicy);
 
-            context.Response.Results = ResponseResult.Create(
-                new FileSystemListPathsCommandResult(paths ?? []),
-                StorageJsonContext.Default.FileSystemListPathsCommandResult);
+            context.Response.Results = ResponseResult.Create(new(paths ?? []), StorageJsonContext.Default.FileSystemListPathsCommandResult);
         }
         catch (Exception ex)
         {
@@ -86,5 +85,5 @@ public sealed class FileSystemListPathsCommand(ILogger<FileSystemListPathsComman
         return context.Response;
     }
 
-    internal record FileSystemListPathsCommandResult(List<DataLakePathInfo> Paths);
+    internal record FileSystemListPathsCommandResult([property: JsonPropertyName("paths")] List<DataLakePathInfo> Paths);
 }
