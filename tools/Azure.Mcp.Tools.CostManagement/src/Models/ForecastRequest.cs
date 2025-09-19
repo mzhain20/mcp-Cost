@@ -8,7 +8,7 @@ namespace Azure.Mcp.Tools.CostManagement.Models;
 /// <summary>
 /// The definition of a query request to the Cost Management API.
 /// </summary>
-public sealed class ForecastRequest : QueryApiRequest
+public class ForecastRequest : QueryApiRequest
 {
     /// <summary>
     /// A boolean determining if actualCost will be included.

@@ -63,7 +63,7 @@ public sealed class ForecastGetCommand(ILogger<ForecastGetCommand> logger) : Sub
         command.Options.Add(_includeFreshPartialCostOption);
     }
 
-    protected override CostGetCommandOptions BindOptions(ParseResult parseResult)
+    protected override ForecastGetCommandOptions BindOptions(ParseResult parseResult)
     {
         var options = base.BindOptions(parseResult);
         options.Type = parseResult.GetValueOrDefault(_typeOption);

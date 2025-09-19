@@ -71,7 +71,7 @@ public sealed class CostManagementService(
         }
     }
 
-    Task<QueryApiResponse?> QueryForecast(
+    public async Task<QueryApiResponse?> QueryForecast(
        string subscription,
        string type,
        string granularity,
@@ -120,7 +120,7 @@ public sealed class CostManagementService(
         }
     }
 
-    private static QueryApiRequest BuildForecastRequest(
+    private static ForecastRequest BuildForecastRequest(
         string type,
         string granularity,
         DateTime? fromDate,
@@ -134,7 +134,7 @@ public sealed class CostManagementService(
         var endDate = toDate ?? DateTime.UtcNow.Date;
         var startDate = fromDate ?? endDate.AddDays(-30);
 
-        var request = new ForecsastRequest
+        var request = new ForecastRequest
         {
             Type = type,
             Timeframe = "Custom",

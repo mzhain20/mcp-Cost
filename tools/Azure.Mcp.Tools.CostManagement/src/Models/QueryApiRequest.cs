@@ -8,7 +8,7 @@ namespace Azure.Mcp.Tools.CostManagement.Models;
 /// <summary>
 /// The definition of a query request to the Cost Management API.
 /// </summary>
-public sealed class QueryApiRequest
+public class QueryApiRequest
 {
     /// <summary>
     /// The type of the query.

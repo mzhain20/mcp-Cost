@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Azure.Mcp.Tools.CostManagement.Commands;
 using Azure.Mcp.Tools.CostManagement.Commands.Cost;
 using System.Text.Json;
 using System.Text.Json.Serialization;
