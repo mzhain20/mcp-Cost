@@ -77,7 +77,8 @@ public sealed class CostManagementService(
        string granularity,
        DateTime? fromDate = null,
        DateTime? toDate = null,
-       string aggregationCostType = "Cost",
+       string aggregationName = "Cost",
+       string aggregationFunction = "Sum",
        bool includeActualCost = false,
        bool includeFreshPartialCost = false,
        string? tenant = null,
@@ -96,14 +97,15 @@ public sealed class CostManagementService(
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
 
             // Build the query request
-            QueryApiRequest queryRequest = BuildQueryRequest(type, granularity, fromDate, toDate, groupBy, aggregationCostType);
+            ForecastRequest queryRequest = BuildForecastRequest(type, granularity, fromDate, toDate, aggregationName,
+            aggregationFunction, includeActualCost, includeFreshPartialCost);
 
             // Serialize the request body
-            var jsonContent = JsonSerializer.Serialize(queryRequest, CostManagementJsonContext.Default.QueryApiRequest);
+            var jsonContent = JsonSerializer.Serialize(queryRequest, CostManagementJsonContext.Default.ForecastRequest);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             // Make the API call
-            var url = $"/subscriptions/{subscription}/providers/Microsoft.CostManagement/query?api-version={CostManagementApiVersion}&top=5000";
+            var url = $"/subscriptions/{subscription}/providers/Microsoft.CostManagement/forecast?api-version={CostManagementApiVersion}&top=5000";
             using var response = await client.PostAsync(url, content);
             response.EnsureSuccessStatusCode();
 
@@ -114,17 +116,17 @@ public sealed class CostManagementService(
         }
         catch (Exception ex)
         {
-            throw new Exception($"Error querying cost management data: {ex.Message}", ex);
+            throw new Exception($"Error querying cost management forecast data: {ex.Message}", ex);
         }
     }
 
-    private static QueryApiRequest BuildQueryRequest(
+    private static QueryApiRequest BuildForecastRequest(
         string type,
         string granularity,
         DateTime? fromDate,
         DateTime? toDate,
         string aggregationName,
-        string aggregationType,
+        string aggregationFunction,
         bool includeActualCost = false,
         bool includeFreshPartialCost = false)
     {
@@ -143,8 +145,8 @@ public sealed class CostManagementService(
                 {
                     ["Cost"] = new QueryAggregation
                     {
-                        Name = aggregationCostType,
-                        Function = "Sum"
+                        Name = aggregationName,
+                        Function = aggregationFunction
                     }
                 }
             },

@@ -3,6 +3,7 @@
 
 using Azure.Mcp.Core.Areas;
 using Azure.Mcp.Core.Commands;
+using Azure.Mcp.Tools.CostManagement.Commands;
 using Azure.Mcp.Tools.CostManagement.Commands.Cost;
 using Azure.Mcp.Tools.CostManagement.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,5 +27,7 @@ public class CostManagementSetup : IAreaSetup
 
         costManagement.AddCommand("get", new CostGetCommand(
             loggerFactory.CreateLogger<CostGetCommand>()));
+        costManagement.AddCommand("get", new ForecastGetCommand(
+            loggerFactory.CreateLogger<ForecastGetCommand>()));
     }
 }

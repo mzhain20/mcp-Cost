@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Azure.Mcp.Tools.CostManagement.Models;
 
+[JsonSerializable(typeof(ForecastRequest))]
 [JsonSerializable(typeof(QueryApiRequest))]
 [JsonSerializable(typeof(QueryApiResponse))]
 [JsonSerializable(typeof(QueryDataset))]
@@ -19,6 +20,7 @@ namespace Azure.Mcp.Tools.CostManagement.Models;
 [JsonSerializable(typeof(QueryResultProperties))]
 [JsonSerializable(typeof(QueryColumn))]
 [JsonSerializable(typeof(CostGetCommand.CostGetCommandResult))]
+[JsonSerializable(typeof(ForecastGetCommand.ForecastGetCommandResult))]
 [JsonSerializable(typeof(JsonElement))]
 [JsonSerializable(typeof(object))]
 internal partial class CostManagementJsonContext : JsonSerializerContext

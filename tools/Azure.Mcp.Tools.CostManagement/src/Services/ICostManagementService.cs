@@ -32,13 +32,29 @@ public interface ICostManagementService
         string? tenant = null,
         RetryPolicyOptions? retryPolicy = null);
 
+    /// <summary>
+    /// Query Azure Cost Management forecast data for usage and cost information.
+    /// </summary>
+    /// <param name="subscription">The subscription ID to query.</param>
+    /// <param name="type">The type of cost data to query (ActualCost, AmortizedCost, Usage).</param>
+    /// <param name="granularity">The granularity of the data (Daily, Monthly).</param>
+    /// <param name="fromDate">Start date for the query period.</param>
+    /// <param name="toDate">End date for the query period.</param>
+    /// <param name="aggregationName">The cost type for aggregation (Cost, PreTaxCost, etc.).</param>
+    /// <param name="aggregationFunction">The aggregation function (Sum, Count, Min etc.).</param>
+    /// <param name="includeActualCost">A boolean determining if actual cost will be included.</param>
+    /// <param name="includeFreshPartialCost">A boolean determining if fresh partial cost will be included.</param>
+    /// <param name="tenant">Optional tenant ID.</param>
+    /// <param name="retryPolicy">Optional retry policy configuration.</param>
+    /// <returns>Results containing forecasted cost and usage data.</returns>
     Task<QueryApiResponse?> QueryForecast(
         string subscription,
         string type,
         string granularity,
         DateTime? fromDate = null,
         DateTime? toDate = null,
-        string aggregationCostType = "Cost",
+        string aggregationName = "Cost",
+        string aggregationFunction = "Sum",
         bool includeActualCost = false,
         bool includeFreshPartialCost = false,
         string? tenant = null,
