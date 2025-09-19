@@ -3,7 +3,7 @@
 
 namespace Azure.Mcp.Tools.CostManagement.Options.Forecast;
 
-public static class ForecastCommandOptionDefinitions
+public static class ForecastGetCommandOptionDefinitions
 {
     public const string Type = "type";
     public const string Timeframe = "timeframe";
@@ -70,7 +70,7 @@ public static class ForecastCommandOptionDefinitions
         Description = "A boolean determining if fresh partial cost will be included.",
         Required = false
     };
-    
+
     public static readonly Option<bool> IncludeActualCostOption = new(
         $"--{IncludeActualCost}"
     )

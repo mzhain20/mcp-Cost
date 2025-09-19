@@ -1,0 +1,131 @@
+{
+  "pluginName": "cost_management_forecast_plugin",
+  "allowedClients": [ "Agent:CostManagementAgent" ],
+  "isLKG": true,
+  "icm": {
+    "service": "Commerce Cost Management",
+    "team": "CCM-LUX",
+    "teamId": ""
+  },
+  "manifest": {
+    "version": "1.0.0",
+    "schema_version": "v1",
+    "name_for_human": "cost_management_forecast_plugin",
+    "description_for_human": "Getting Cost Management Actuals",
+    "functions": [
+      {
+        "name": "cost_management_forecast_plugin",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dataset": {
+              "type": "object",
+              "properties": {
+                "granularity": {
+                  "type": "string",
+                  "enum": [ "None", "Daily", "Monthly" ],
+                  "description": "Granularity groups cost data by time intervals of a day, month or not at all. Select 'None' if the user wants to see the total costs over the time period, or if the user wants to see a specific day or month. Select 'Daily' or 'Monthly' if a user wants to see trends over a time period. Select 'Daily' when keywords like 'daily', 'per day' are present or multiple days are specified. Select 'Monthly' when keywords like 'monthly', 'per month' are present or multiple months specified. Granularity is distinct from the time period."
+                },
+                "aggregationName": {
+                  "type": "string",
+                  "description": "The type of cost to use. This can either be Pre Tax Cost or Total Cost, and it can be either in USD or local currency.",
+                  "enum": [ "PreTaxCost", "Cost", "PreTaxCostUSD", "CostUSD" ],
+                  "default": "Cost"
+                },
+                "aggregationFunction": {
+                  "type": "string",
+                  "description": "The type of function to use. This can be Sum (default), Count, Min, Max, Avg.",
+                  "enum": [ "Sum", "Count", "Min", "Max", "Avg" ],
+                  "default": "Sum"
+                }
+              },
+              "required": [ "granularity", "aggregationName", "aggregationFunction" ],
+              "additionalProperties": false
+            },
+            "costType": {
+              "type": "string",
+              "enum": [ "ActualCost", "AmortizedCost" ],
+              "description": "The cost type parameter for the query API. Determines whether to use 'ActualCost' (default) or 'AmortizedCost' based on user intent. ActualCost for general cost queries, AmortizedCost for reservation/savings plan utilization, coverage, and amortization scenarios. Use ActualCost by default. Only use AmortizedCost when specifically asked for the amount of used, unused, unutilized, or wasted reservation and savings plan benefits, breaking down a one-time cost into periodic payments, and identifying resources, subscriptions, and other entities that received benefits or coverage from reservations and savings plans benefits.",
+              "default": "ActualCost"
+            },
+            "includeFreshPartialCost": {
+              "type": "boolean",
+              "description": "Indicates whether to include fresh partial cost data in the forecast results. Fresh partial cost represents the most recent cost data that may not be fully processed or finalized.",
+              "default": false
+            },
+            "includeActualCost": {
+              "type": "boolean",
+              "description": "Indicates whether to include actual cost data in the forecast results. Actual cost represents the finalized and processed cost data.",
+              "default": false
+            },
+            "timeperiod": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "Start date of the time period. Use YYYY-MM-DDTHH:MM:SS format",
+                  "pattern": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})$"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "End date of the time period. Use YYYY-MM-DDTHH:MM:SS format",
+                  "pattern": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})$"
+                }
+              },
+              "required": [ "to", "from" ],
+              "additionalProperties": false,
+              "description": "The time period for the forecast query with 'from' and 'to' dates. Determine the specific date range based on user intent. If no time period is specified in the user prompt, set 'from' as 1 month from today, and 'to' as todays date. 'to' should be set to today's date when used to determine all relative dates eg/ last week, last month, last year. When user refers to a month, default to first of the month unless specifically stated otherwise. Dates should be in YYYY-MM-DDTHH:MM:SS format. The time period should be a maximum of 1 year, therefore if there is a request for cost management data greater than 1 year just use 1 year. Consider adjusting time periods to start and end on the first and last day of the month/year/financial year respectively, when appropriate."
+            },
+            "subscriptionId": {
+              "description": "The subscriptionId to get the forecast data for",
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+            }
+          },
+          "required": [ "subscriptionId", "costType", "timeperiod", "dataset" ],
+          "additionalProperties": false
+        },
+        "states": {
+          "reasoning": {
+            "description": "Get forecast cost information for Azure. All cost information is grouped by a subscription; if there is no subscription Id (guuid) in the users request clarify the subscription Id before continuing. Do not use a placeholder for subscription Id. If a subscription Id cannot be inferred request clarification from the user",
+            "examples": [
+              "What is my forecast cost for the next three months for the subscription 9cad9a8f-1bc0-44fc-a267-09109199538d",
+              "Can you provide a forecast cost breakdown for Prod vs UAT vs DEV using the Tag Environment in subscription 9cad9a8f-1bc0-44fc-a267-09109199538d",
+              "Can you show me forecast cost per resource type in subscription 9cad9a8f-1bc0-44fc-a267-09109199538d and resource group my-RG"
+            ]
+          }
+        }
+      }
+    ],
+    "runtimes": [
+      {
+        "auth": {
+          "scopes": [ "https://management.azure.com/.default" ],
+          "type": "EntraOnBehalfOf"
+        },
+        "run_for_functions": [ "cost_management_forecast_plugin" ],
+        "spec": [
+          {
+            "dataBoundary": "ROW",
+            "urlTemplate": "https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.CostManagement/forecast?api-version=2025-03-01",
+            "http_method": "POST",
+            "script": "function EvaluateHttpPluginPayLoad(response) local d={} if response.dataset.aggregationName then d.aggregation={totalCost={[\"function\"]=\"Sum\",name=response.dataset.aggregationName or \"Cost\"}} end if response.dataset.granularity then d.granularity=response.dataset.granularity end if response and type(response.dataset)==\"table\" then local g=response.dataset.grouping if (type(g)==\"string\" and g~=\"\") or (type(g)==\"table\" and next(g)) then d.grouping=g d.sorting={{name=response.dataset.aggregationCostType or \"Cost\",direction=\"Descending\"}} end end return {timeframe=\"Custom\",dataset=d,timeperiod=response.timeperiod,type=response.costType} end",
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          {
+            "dataBoundary": "EU",
+            "urlTemplate": "https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.CostManagement/forecast?api-version=2025-03-01",
+            "http_method": "POST",
+            "script": "function EvaluateHttpPluginPayLoad(response) local d={} if response.dataset.aggregationName then d.aggregation={totalCost={[\"function\"]=\"Sum\",name=response.dataset.aggregationName or \"Cost\"}} end if response.dataset.granularity then d.granularity=response.dataset.granularity end if response and type(response.dataset)==\"table\" then local g=response.dataset.grouping if (type(g)==\"string\" and g~=\"\") or (type(g)==\"table\" and next(g)) then d.grouping=g d.sorting={{name=response.dataset.aggregationCostType or \"Cost\",direction=\"Descending\"}} end end return {timeframe=\"Custom\",dataset=d,timeperiod=response.timeperiod,type=response.costType} end",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        ],
+        "type": "Http"
+      }
+    ]
+  }
+}

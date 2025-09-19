@@ -15,20 +15,20 @@ using System.CommandLine.Parsing;
 
 namespace Azure.Mcp.Tools.CostManagement.Commands;
 
-public sealed class ForecastGetCommand(ILogger<ForecastGetCommand> logger) : SubscriptionCommand<ForecastCommandOptions>
+public sealed class ForecastGetCommand(ILogger<ForecastGetCommand> logger) : SubscriptionCommand<ForecastGetCommandOptions>
 {
     private const string CommandTitle = "Get Azure Cost Management Forecast";
-    private readonly ILogger<CostGetCommand> _logger = logger;
+    private readonly ILogger<ForecastGetCommand> _logger = logger;
 
     // Define options from OptionDefinitions
-    private readonly Option<string> _typeOption = ForecastCommandOptionDefinitions.TypeOption;
-    private readonly Option<string> _granularityOption = ForecastCommandOptionDefinitions.GranularityOption;
-    private readonly Option<DateTime?> _fromDateOption = ForecastCommandOptionDefinitions.FromDateOption;
-    private readonly Option<DateTime?> _toDateOption = ForecastCommandOptionDefinitions.ToDateOption;
-    private readonly Option<string> _aggregationFunctionOption = ForecastCommandOptionDefinitions.AggregationFunctionOption;
-    private readonly Option<string> _aggregationNameOption = ForecastCommandOptionDefinitions.AggregationNameOption;
-    private readonly Option<bool> _includeFreshPartialCostOption = ForecastCommandOptionDefinitions.IncludeFreshPartialCostOption;
-    private readonly Option<bool> _includeActualCostOption = ForecastCommandOptionDefinitions.IncludeActualCostOption;
+    private readonly Option<string> _typeOption = ForecastGetCommandOptionDefinitions.TypeOption;
+    private readonly Option<string> _granularityOption = ForecastGetCommandOptionDefinitions.GranularityOption;
+    private readonly Option<DateTime?> _fromDateOption = ForecastGetCommandOptionDefinitions.FromDateOption;
+    private readonly Option<DateTime?> _toDateOption = ForecastGetCommandOptionDefinitions.ToDateOption;
+    private readonly Option<string> _aggregationFunctionOption = ForecastGetCommandOptionDefinitions.AggregationFunctionOption;
+    private readonly Option<string> _aggregationNameOption = ForecastGetCommandOptionDefinitions.AggregationNameOption;
+    private readonly Option<bool> _includeFreshPartialCostOption = ForecastGetCommandOptionDefinitions.IncludeFreshPartialCostOption;
+    private readonly Option<bool> _includeActualCostOption = ForecastGetCommandOptionDefinitions.IncludeActualCostOption;
 
     public override string Name => "get";
 
