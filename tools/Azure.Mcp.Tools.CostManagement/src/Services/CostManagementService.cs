@@ -130,9 +130,9 @@ public sealed class CostManagementService(
         bool includeActualCost = false,
         bool includeFreshPartialCost = false)
     {
-        // Calculate default time period if not provided (last 30 days)
-        var endDate = toDate ?? DateTime.UtcNow.Date;
-        var startDate = fromDate ?? endDate.AddDays(-30);
+        // Calculate default time period if not provided (next 30 days)
+        var endDate = toDate ?? DateTime.UtcNow.Date.AddDays(30);
+        var startDate = fromDate ?? DateTime.UtcNow.Date;
 
         var request = new ForecastRequest
         {
